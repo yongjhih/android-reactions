@@ -10,12 +10,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import com.github.pgreze.reactions.PopupGravity.CENTER
-import com.github.pgreze.reactions.PopupGravity.DEFAULT
-import com.github.pgreze.reactions.PopupGravity.PARENT_LEFT
-import com.github.pgreze.reactions.PopupGravity.PARENT_RIGHT
-import com.github.pgreze.reactions.PopupGravity.SCREEN_LEFT
-import com.github.pgreze.reactions.PopupGravity.SCREEN_RIGHT
+import com.github.pgreze.reactions.PopupGravity.*
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -165,10 +160,10 @@ class ReactionViewGroup(
         }
 
         // Y position will be slightly on top of parent view
-        dialogY = parentLocation.y - dialogHeight * 2
-        if (dialogY < 0) {
+        dialogY = parentLocation.y - (dialogHeight + config.upwardPopupMargin)
+        if (dialogY < config.downwardPopupPoint) {
             // Below parent view
-            dialogY = parentLocation.y + parentSize.height + dialogHeight
+            dialogY = parentLocation.y + parentSize.height + config.downwardPopupMargin
         }
     }
 

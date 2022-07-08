@@ -50,6 +50,13 @@ data class ReactionsConfig(
     val popupCornerRadius: Int,
     @ColorInt val popupColor: Int,
     @IntRange(from = 0, to = 255) val popupAlphaValue: Int,
+    /** Margin between dialog and parent view when dialog opens upward */
+    val upwardPopupMargin: Int,
+    /** Margin between dialog and parent view when dialog opens downward */
+    val downwardPopupMargin: Int,
+
+    /** Point X location for when the dialog will open downward if dialogY is less than it */
+    val downwardPopupPoint: Int,
 
     val reactionTextProvider: ReactionTextProvider,
     val textBackground: Drawable,
@@ -111,6 +118,12 @@ class ReactionsConfigBuilder(val context: Context) {
     var customTypeface: Typeface? = null
 
     var popupMargin: Int = horizontalMargin
+
+    var upwardPopupMargin: Int = horizontalMargin
+
+    var downwardPopupMargin: Int = horizontalMargin
+
+    var downwardPopupPoint: Int = 0
 
     var popupCornerRadius: Int = 90
 
@@ -192,6 +205,18 @@ class ReactionsConfigBuilder(val context: Context) {
         this.popupAlpha = popupAlpha
     }
 
+    fun withUpwardPopupMargin(value: Int) = this.also {
+        this.upwardPopupMargin = value
+    }
+
+    fun withDownwardPopupMargin(value: Int) = this.also {
+        this.downwardPopupMargin = value
+    }
+
+    fun withDownwardPopupPoint(value: Int) = this.also {
+        this.downwardPopupPoint = value
+    }
+
     fun withTextBackground(textBackground: Drawable) = this.also {
         this.textBackground = textBackground
     }
@@ -223,6 +248,9 @@ class ReactionsConfigBuilder(val context: Context) {
         popupMargin = popupMargin,
         popupCornerRadius = popupCornerRadius,
         popupColor = popupColor,
+        upwardPopupMargin = upwardPopupMargin,
+        downwardPopupMargin = downwardPopupMargin,
+        downwardPopupPoint = downwardPopupPoint,
         popupAlphaValue = popupAlpha,
         reactionSize = reactionSize,
         horizontalMargin = horizontalMargin,
