@@ -51,10 +51,12 @@ class ReactionViewGroup(
         val nIcons = config.reactions.size
         val nDividers = max(1, nIcons - 1)
 
+        // [horizontalPadding][...[iconDivider][mediumIconSize][iconDivider]...][horizontalPadding]
         dialogWidth = horizontalPadding * 2 +
                 mediumIconSize * nIcons +
                 iconDivider * nDividers
 
+        // [horizontalPadding][largeIconSize][[iconDivider][smallIconSize][iconDivider]...][horizontalPadding]
         smallIconSize = (dialogWidth
                 - horizontalPadding * 2
                 - largeIconSize
@@ -104,9 +106,19 @@ class ReactionViewGroup(
             field = value
             Log.i(TAG, "State: $oldValue -> $value")
             when (value) {
-                is ReactionViewState.Boundary -> animTranslationY(value)
-                is ReactionViewState.WaitingSelection -> animSize(null)
-                is ReactionViewState.Selected -> animSize(value)
+                is ReactionViewState.Boundary -> {
+                    animTranslationY(value)
+                }
+                is ReactionViewState.WaitingSelection -> {
+                    background.layoutParams = LayoutParams(dialogWidth, mediumIconSize)
+                    background.requestLayout()
+                    animSize(null)
+                }
+                is ReactionViewState.Selected -> {
+                    background.layoutParams = LayoutParams(dialogWidth, smallIconSize)
+                    background.requestLayout()
+                    animSize(value)
+                }
             }
         }
 

@@ -65,7 +65,7 @@ data class ReactionsConfig(
     val textVerticalPadding: Int,
     val textSize: Float,
     val typeface: Typeface?,
-    val scaleFactor: Float = 1.5f
+    val scaleFactor: Float
 )
 
 private val NO_TEXT_PROVIDER: ReactionTextProvider = { _ -> null }
@@ -152,6 +152,7 @@ class ReactionsConfigBuilder(val context: Context) {
 
     var textSize: Float = 0f
 
+    var scaleFactor = 2.0f
     // Builder pattern for Java
 
     fun withReactions(reactions: Collection<Reaction>) = this.also {
@@ -267,6 +268,7 @@ class ReactionsConfigBuilder(val context: Context) {
             ?: context.resources.getDimension(R.dimen.reactions_text_vertical_padding).roundToInt(),
         textSize = textSize.takeIf { it != 0f }
             ?: context.resources.getDimension(R.dimen.reactions_text_size),
-        typeface = customTypeface
+        typeface = customTypeface,
+        scaleFactor = scaleFactor
     )
 }
