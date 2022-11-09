@@ -38,7 +38,7 @@ class ReactionViewGroup(
 
     private var smallIconSize: Int
     private var mediumIconSize: Int = config.reactionSize
-    private var largeIconSize: Int = 2 * mediumIconSize
+    private var largeIconSize: Int = (config.scaleFactor * mediumIconSize).toInt()
 
     private var firstClick = Point()
     private var parentLocation = Point()

@@ -64,7 +64,8 @@ data class ReactionsConfig(
     val textHorizontalPadding: Int,
     val textVerticalPadding: Int,
     val textSize: Float,
-    val typeface: Typeface?
+    val typeface: Typeface?,
+    val scaleFactor: Float = 1.5f
 )
 
 private val NO_TEXT_PROVIDER: ReactionTextProvider = { _ -> null }
