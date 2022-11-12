@@ -5,6 +5,7 @@ package com.github.pgreze.reactions.dsl
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import com.github.pgreze.reactions.Reaction
 import com.github.pgreze.reactions.ReactionPopup
 import com.github.pgreze.reactions.ReactionPopupStateChangeListener
@@ -49,13 +50,13 @@ class ReactionsConfiguration(
 ) {
     fun resId(block: () -> Int) {
         reactions += Reaction(
-            image = getDrawableCompat(context, block())!!,
-            scaleType = scaleType
+            onView = { ImageView(it).apply {
+                //ContextCompat.getDrawable(it, block())!!
+                setImageResource(block())
+                scaleType = scaleType
+            } },
+            scaleType = scaleType,
         )
-    }
-
-    fun drawable(block: () -> Drawable) {
-        reactions += Reaction(image = block(), scaleType = scaleType)
     }
 
     fun reaction(block: ReactionBuilderBlock.() -> Reaction) {
@@ -66,10 +67,10 @@ class ReactionsConfiguration(
 class ReactionBuilderBlock(private val context: Context) {
 
     infix fun Int.scale(scaleType: ImageView.ScaleType) = Reaction(
-        image = getDrawableCompat(context, this)!!,
+        onView = { ImageView(it).also {
+            //ContextCompat.getDrawable(it, block())!!
+            it.setImageResource(this)
+        } },
         scaleType = scaleType
     )
-
-    infix fun Drawable.scale(scaleType: ImageView.ScaleType) =
-        Reaction(image = this, scaleType = scaleType)
 }

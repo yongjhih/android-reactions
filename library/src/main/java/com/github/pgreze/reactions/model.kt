@@ -4,11 +4,10 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
+import android.view.View
 import android.widget.ImageView
-import androidx.annotation.ArrayRes
-import androidx.annotation.ColorInt
+import androidx.annotation.*
 import androidx.annotation.IntRange
-import androidx.annotation.Px
 import androidx.core.content.ContextCompat
 import kotlin.math.roundToInt
 
@@ -33,7 +32,7 @@ typealias ReactionTextProvider = (position: Int) -> CharSequence?
 typealias ReactionPopupStateChangeListener = (isShowing: Boolean) -> Unit
 
 data class Reaction(
-    val image: Drawable,
+    val onView: (Context) -> View,
     val scaleType: ImageView.ScaleType = ImageView.ScaleType.FIT_CENTER
 )
 
@@ -163,9 +162,13 @@ class ReactionsConfigBuilder(val context: Context) {
     fun withReactions(
         res: IntArray,
         scaleType: ImageView.ScaleType = ImageView.ScaleType.FIT_CENTER
-    ) = withReactions(res.map {
-        Reaction(ContextCompat.getDrawable(context, it)!!, scaleType)
-    })
+    ) = withReactions(res.map { r -> Reaction(
+        onView = { ctx -> ImageView(ctx).apply {
+            setImageResource(r)
+            this.scaleType = scaleType
+        } },
+        scaleType,
+    ) })
 
     fun withReactionTexts(reactionTextProvider: ReactionTextProvider) = this.also {
         this.reactionTextProvider = reactionTextProvider

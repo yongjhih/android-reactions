@@ -23,8 +23,9 @@ configure<LibraryExtension> {
 }
 
 dependencies {
-    api(Kotlin.stdlib.jdk7)
-    api(AndroidX.core)
+    implementation(Kotlin.stdlib.jdk7)
+    implementation(AndroidX.core)
+    implementation("androidx.transition:transition:1.4.1")
 }
 
 apply {

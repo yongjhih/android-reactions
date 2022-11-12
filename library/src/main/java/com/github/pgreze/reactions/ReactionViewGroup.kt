@@ -6,9 +6,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Point
 import android.util.Log
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.view.animation.Animation
+import android.view.animation.Transformation
 import android.widget.TextView
 import com.github.pgreze.reactions.PopupGravity.*
 import kotlin.math.max
@@ -29,6 +29,7 @@ class ReactionViewGroup(
 
     private companion object {
         private const val TAG = "Reaction"
+        const val SCALE_DURATION = 100L
     }
 
     private val horizontalPadding: Int = config.horizontalMargin
@@ -64,11 +65,11 @@ class ReactionViewGroup(
                 ) / nDividers
     }
 
-    private val background = RoundedView(context, config)
-        .also {
-            it.layoutParams = LayoutParams(dialogWidth, dialogHeight)
-            addView(it)
-        }
+    private val background = RoundedView(context, config).also {
+        it.layoutParams = LayoutParams(dialogWidth, dialogHeight)
+        addView(it)
+    }
+
     private val reactions: List<ReactionView> = config.reactions
         .map { reaction ->
             ReactionView(context, reaction).also { reactionView ->
@@ -110,13 +111,19 @@ class ReactionViewGroup(
                     animTranslationY(value)
                 }
                 is ReactionViewState.WaitingSelection -> {
-                    background.layoutParams = LayoutParams(dialogWidth, mediumIconSize)
-                    background.requestLayout()
+                    //background.layoutParams = LayoutParams(dialogWidth, mediumIconSize)
+                    //background.requestLayout()
+                    background.startAnimation(ResizeAnimation(background, dialogWidth, mediumIconSize).apply {
+                        duration = SCALE_DURATION
+                    })
                     animSize(null)
                 }
                 is ReactionViewState.Selected -> {
-                    background.layoutParams = LayoutParams(dialogWidth, smallIconSize)
-                    background.requestLayout()
+                    //background.layoutParams = LayoutParams(dialogWidth, smallIconSize)
+                    //background.requestLayout()
+                    background.startAnimation(ResizeAnimation(background, dialogWidth, smallIconSize).apply {
+                        duration = SCALE_DURATION
+                    })
                     animSize(value)
                 }
             }
@@ -128,7 +135,7 @@ class ReactionViewGroup(
 
             field = value
             reactionText.visibility = View.GONE
-            field?.duration = 100
+            field?.duration = SCALE_DURATION
             field?.start()
         }
 
@@ -179,6 +186,12 @@ class ReactionViewGroup(
         }
     }
 
+    // Since we have ViewGroup children, we need to notify how much available space for them
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        measureChildren(widthMeasureSpec, heightMeasureSpec)
+    }
+
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         background.also { view ->
             val translationX = view.translationX.toInt()
@@ -193,16 +206,18 @@ class ReactionViewGroup(
 
         var prevX = 0
         reactions.forEach { view ->
-            val translationX = view.translationX.toInt()
-            val translationY = view.translationY.toInt()
+            val translationX = 0
+            val translationY = 0
 
+            val w = view.measuredWidth
+            val h = view.measuredHeight
             val bottom = dialogY + dialogHeight - verticalPadding + translationY
-            val top = bottom - view.layoutParams.height + translationY
+            val top = bottom - h + translationY
             val left = dialogX + horizontalPadding + prevX + translationX
-            val right = left + view.layoutParams.width + translationX
+            val right = left + w + translationX
             view.layout(left, top, right, bottom)
 
-            prevX += view.width + iconDivider
+            prevX += w + iconDivider
         }
 
         if (reactionText.visibility == View.VISIBLE) {
@@ -456,4 +471,34 @@ sealed class ReactionViewState {
      * Increase size of selected [view] while others are decreasing.
      */
     class Selected(val view: ReactionView) : ReactionViewState()
+}
+
+fun ViewPropertyAnimator.resize(
+    view: View,
+    toWidth: Int,
+    toHeight: Int,
+) = let {
+    scaleX((toWidth / view.layoutParams.width.toFloat()))
+    scaleY((toHeight / view.layoutParams.height.toFloat()))
+}
+
+class ResizeAnimation(
+    private val view: View,
+    private val toWidth: Int,
+    private val toHeight: Int,
+    private val fromWidth: Int? = null,
+    private val fromHeight: Int? = null,
+) : Animation() {
+    override fun applyTransformation(
+        interpolatedTime: Float,
+        t: Transformation?
+    ) {
+        val fromWidth = fromWidth ?: view.layoutParams.width.takeIf { it >= 0 } ?: view.width
+        val fromHeight = fromHeight ?: view.layoutParams.height.takeIf { it >= 0 } ?: view.height
+        view.layoutParams = view.layoutParams.also {
+            it.height = ((toHeight - fromHeight) * interpolatedTime + fromHeight).toInt()
+            it.width = ((toWidth - fromWidth) * interpolatedTime + fromWidth).toInt()
+        }
+        view.requestLayout()
+    }
 }

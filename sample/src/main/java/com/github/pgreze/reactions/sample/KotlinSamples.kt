@@ -1,5 +1,6 @@
 package com.github.pgreze.reactions.sample
 
+import android.animation.ValueAnimator
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
@@ -9,10 +10,8 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.DrawableRes
-import com.github.pgreze.reactions.PopupGravity
-import com.github.pgreze.reactions.ReactionPopup
-import com.github.pgreze.reactions.ReactionPopupStateChangeListener
-import com.github.pgreze.reactions.ReactionSelectedListener
+import com.airbnb.lottie.LottieAnimationView
+import com.github.pgreze.reactions.*
 import com.github.pgreze.reactions.dsl.reactionConfig
 import com.github.pgreze.reactions.dsl.reactionPopup
 import com.github.pgreze.reactions.dsl.reactions
@@ -26,11 +25,11 @@ fun MainActivity.setupTopRight() {
             resId { R.drawable.ic_crypto_ltc }
             reaction { R.drawable.ic_crypto_dash scale ImageView.ScaleType.FIT_CENTER }
             reaction { R.drawable.ic_crypto_xrp scale ImageView.ScaleType.FIT_CENTER }
-            drawable { drawable(R.drawable.ic_crypto_xmr) }
-            drawable { drawable(R.drawable.ic_crypto_doge) }
-            reaction { drawable(R.drawable.ic_crypto_steem) scale ImageView.ScaleType.FIT_CENTER }
-            reaction { drawable(R.drawable.ic_crypto_kmd) scale ImageView.ScaleType.FIT_CENTER }
-            drawable { drawable(R.drawable.ic_crypto_zec) }
+            resId { R.drawable.ic_crypto_xmr }
+            resId { R.drawable.ic_crypto_doge }
+            resId { R.drawable.ic_crypto_steem }
+            resId { R.drawable.ic_crypto_kmd }
+            resId { R.drawable.ic_crypto_zec }
         }
         reactionTexts = R.array.crypto_symbols
         popupCornerRadius = 40
@@ -63,6 +62,45 @@ fun MainActivity.setupRight() {
             R.drawable.ic_crypto_kmd,
             R.drawable.ic_crypto_zec
         )
+        /*
+        withReactions(listOf(
+            Reaction(
+                onView = { ctx -> LottieAnimationView(ctx).apply {
+                    setAnimation(R.raw.love)
+                    playAnimation()
+                    repeatCount = ValueAnimator.INFINITE
+                } },
+            ),
+            Reaction(
+                onView = { ctx -> LottieAnimationView(ctx).apply {
+                    setAnimation(R.raw.cheer)
+                    playAnimation()
+                    repeatCount = ValueAnimator.INFINITE
+                } },
+            ),
+            Reaction(
+                onView = { ctx -> LottieAnimationView(ctx).apply {
+                    setAnimation(R.raw.rocket)
+                    playAnimation()
+                    repeatCount = ValueAnimator.INFINITE
+                } },
+            ),
+            Reaction(
+                onView = { ctx -> LottieAnimationView(ctx).apply {
+                    setAnimation(R.raw.like)
+                    playAnimation()
+                    repeatCount = ValueAnimator.INFINITE
+                } },
+            ),
+            Reaction(
+                onView = { ctx -> LottieAnimationView(ctx).apply {
+                    setAnimation(R.raw.happy)
+                    playAnimation()
+                    repeatCount = ValueAnimator.INFINITE
+                } },
+            ),
+        ))
+        */
         reactionTextProvider = { position -> "Item $position" }
         popupGravity = PopupGravity.PARENT_RIGHT
         popupMargin = resources.getDimensionPixelSize(R.dimen.crypto_item_size)

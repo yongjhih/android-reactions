@@ -41,6 +41,9 @@ configure<AppExtension> {
 }
 
 dependencies {
+    implementation(Kotlin.stdlib.jdk7)
+    implementation(AndroidX.core)
+
     implementation(AndroidX.appCompat)
 
     // Enable with -PremoteArtifacts
@@ -51,4 +54,5 @@ dependencies {
     } else {
         implementation(project(":library"))
     }
+    implementation("com.airbnb.android:lottie:5.2.0")
 }
