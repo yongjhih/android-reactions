@@ -44,7 +44,15 @@ class ReactionPopup @JvmOverloads constructor(
             // it will position itself depending on the display preference.
             rootView.addView(it)
 
-            it.dismissListener = ::dismiss
+            it.dismissListener = {
+                it.forEach { child ->
+                    child.translationX = 0f
+                    child.translationY = 0f
+                    child.scaleX = 1f
+                    child.scaleY = 1f
+                }
+                dismiss()
+            }
         }
     }
 

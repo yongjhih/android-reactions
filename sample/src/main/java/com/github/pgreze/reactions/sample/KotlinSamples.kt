@@ -32,7 +32,7 @@ fun MainActivity.setupTopRight() {
             resId { R.drawable.ic_crypto_zec }
         }
         reactionTexts = R.array.crypto_symbols
-        popupCornerRadius = 40
+        popupCornerRadius = 40f
         popupColor = Color.LTGRAY
         popupAlpha = 255
         reactionSize = resources.getDimensionPixelSize(R.dimen.crypto_item_size)

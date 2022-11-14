@@ -4,16 +4,20 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Point
+import android.os.Build
 import android.util.Log
+import android.util.TypedValue
 import android.view.*
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.Transformation
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import com.github.pgreze.reactions.PopupGravity.*
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.roundToInt
+import kotlin.math.*
+
 
 /**
  * This ViewGroup displays Reactions and handles interactions with them.
@@ -30,6 +34,7 @@ class ReactionViewGroup(
     private companion object {
         private const val TAG = "Reaction"
         const val SCALE_DURATION = 100L
+        const val DISMISS_DURATION = 500L
     }
 
     private val horizontalPadding: Int = config.horizontalMargin
@@ -65,8 +70,10 @@ class ReactionViewGroup(
                 ) / nDividers
     }
 
-    private val background = RoundedView(context, config).also {
+    private val background = CardView(context).also {
         it.layoutParams = LayoutParams(dialogWidth, dialogHeight)
+        it.radius = config.popupCornerRadius
+        it.cardElevation = config.popupElevation
         addView(it)
     }
 
@@ -209,13 +216,17 @@ class ReactionViewGroup(
             val translationX = 0
             val translationY = 0
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                // higher layer than background
+                view.z = background.cardElevation + 1f
+            }
             val w = view.measuredWidth
             val h = view.measuredHeight
             val bottom = dialogY + dialogHeight - verticalPadding + translationY
             val top = bottom - h + translationY
             val left = dialogX + horizontalPadding + prevX + translationX
             val right = left + w + translationX
-            view.layout(left, top, right, bottom)
+            view.layout(left.coerceAtLeast(l).coerceAtMost(right), top.coerceAtLeast(t).coerceAtMost(bottom), right.coerceAtMost(r), bottom.coerceAtMost(b))
 
             prevX += w + iconDivider
         }
@@ -236,7 +247,10 @@ class ReactionViewGroup(
         }
     }
 
+    var showPoint: Point? = null
+
     fun show(event: MotionEvent, parent: View) {
+        showPoint = Point(event.rawX.roundToInt(), event.rawY.roundToInt())
         this.firstClick = Point(event.rawX.roundToInt(), event.rawY.roundToInt())
         this.parentLocation = IntArray(2)
             .also(parent::getLocationOnScreen)
@@ -255,6 +269,7 @@ class ReactionViewGroup(
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (isAnimating) return false
         isFirstTouchAlwaysInsideButton = isFirstTouchAlwaysInsideButton && inInsideParentView(event)
 
         when (event.action) {
@@ -270,7 +285,7 @@ class ReactionViewGroup(
                 }
 
                 // Ignores when appearing
-                if (currentState is ReactionViewState.Boundary.Appear && config.ignoreAppear) return true
+                if (currentState is ReactionViewState.Boundary.Appear) return true
 
                 val view = getIntersectedIcon(event.rawX, event.rawY)
                 if (view == null) {
@@ -281,6 +296,7 @@ class ReactionViewGroup(
             }
             MotionEvent.ACTION_UP -> {
                 // Ignores it if first move was always inside parent view
+                isIgnoringFirstReaction = false
                 if (isFirstTouchAlwaysInsideButton) {
                     isFirstTouchAlwaysInsideButton = false
                     return true
@@ -293,6 +309,7 @@ class ReactionViewGroup(
                 } else { // reactionSelectedListener == null or reactionSelectedListener() == true
                     dismiss()
                 }
+
             }
             MotionEvent.ACTION_CANCEL -> {
                 currentState = ReactionViewState.WaitingSelection
@@ -304,6 +321,16 @@ class ReactionViewGroup(
     fun resetChildrenToNormalSize() {
         currentState = ReactionViewState.WaitingSelection
     }
+
+    private fun onDismissed() {
+        visibility = View.GONE
+        currentState = null
+        // Notify listener
+        dismissListener?.invoke()
+        showPoint = null
+    }
+
+    var isAnimating = false
 
     fun dismiss() {
         reactionPopupStateChangeListener?.invoke(false)
@@ -330,15 +357,46 @@ class ReactionViewGroup(
 
     private fun animTranslationY(boundary: ReactionViewState.Boundary) {
         // Init views
+        val isDisappear = boundary is ReactionViewState.Boundary.Disappear
+        val selectedView = (boundary as? ReactionViewState.Boundary.Disappear)?.selectedView
         val initialAlpha = if (boundary is ReactionViewState.Boundary.Appear) 0f else 1f
         forEach {
             it.alpha = initialAlpha
             it.translationY = boundary.path.first.toFloat()
             if (boundary is ReactionViewState.Boundary.Appear) {
                 it.layoutParams.size = mediumIconSize
+                it.translationX = 0f
+                it.translationY = 0f
             }
         }
         requestLayout()
+        selectedView?.let { v -> if (config.dismissAnimationEnabled) {
+            isAnimating = true
+            v.animate()
+                .withEndAction {
+                    isAnimating = false
+                    onDismissed()
+                }
+                .apply { duration = DISMISS_DURATION + 1 }
+                .scaleX(0.1f).scaleY(0.1f)
+                .start()
+            val animator = ValueAnimator.ofFloat(0f, 1f)
+            animator.duration = DISMISS_DURATION
+            animator.interpolator = AccelerateDecelerateInterpolator()
+            val targetX = v.left - (config.targetX ?: showPoint?.x?.minus(horizontalPadding) ?: v.x).toFloat()
+            val targetY = v.bottom - (config.targetY ?: showPoint?.y?.minus(verticalPadding) ?: v.y).toFloat()
+            animator.addUpdateListener { animation ->
+                val value = animation.animatedValue as Float
+                v.translationX = -targetX * value
+
+                // 0   0.5    1
+                // 0.5   0   0.5
+
+                //v.translationY = deltaY * value + ((((value - 0.5f).absoluteValue) - 0.5).absoluteValue * value * 100).toInt()
+                v.translationY = -targetY * value
+            }
+            animator.start()
+        } }
 
         // TODO: animate selected index if boundary == Disappear
         currentAnimator = ValueAnimator.ofFloat(0f, 1f)
@@ -348,11 +406,13 @@ class ReactionViewGroup(
                     val translationY = boundary.path.progressMove(progress).toFloat()
 
                     forEach {
-                        it.translationY = translationY
-                        it.alpha = if (boundary is ReactionViewState.Boundary.Appear) {
-                            progress
-                        } else {
-                            1 - progress
+                        if (it != selectedView || !config.dismissAnimationEnabled) {
+                            it.translationY = translationY
+                            it.alpha = if (boundary is ReactionViewState.Boundary.Appear) {
+                                progress
+                            } else {
+                                1 - progress
+                            }
                         }
                     }
 
@@ -368,10 +428,9 @@ class ReactionViewGroup(
                                 currentState = ReactionViewState.WaitingSelection
                             }
                             is ReactionViewState.Boundary.Disappear -> {
-                                visibility = View.GONE
-                                currentState = null
-                                // Notify listener
-                                dismissListener?.invoke()
+                                if (selectedView == null || !config.dismissAnimationEnabled) {
+                                    onDismissed()
+                                }
                             }
                         }
                     }
@@ -435,7 +494,7 @@ private var ViewGroup.LayoutParams.size: Int
 /** Replace with [android.util.Size] when minSdkVersion = 21 */
 private class Size(val width: Int, val height: Int)
 
-private inline fun ViewGroup.forEach(action: (View) -> Unit) {
+inline fun ViewGroup.forEach(action: (View) -> Unit) {
     for (child in 0 until childCount) {
         action(getChildAt(child))
     }
@@ -500,3 +559,8 @@ class ResizeAnimation(
         view.requestLayout()
     }
 }
+
+val Float.dp get() = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_DIP,
+    this,
+    Resources.getSystem().displayMetrics)

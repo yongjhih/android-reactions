@@ -38,7 +38,6 @@ data class Reaction(
 
 data class ReactionsConfig(
     val reactions: Collection<Reaction>,
-    var ignoreAppear: Boolean,
     @Px val reactionSize: Int,
     @Px val horizontalMargin: Int,
     @Px val verticalMargin: Int,
@@ -47,7 +46,8 @@ data class ReactionsConfig(
     val popupGravity: PopupGravity,
     /** Margin between dialog and screen border used by [PopupGravity] screen related values. */
     val popupMargin: Int,
-    val popupCornerRadius: Int,
+    val popupCornerRadius: Float,
+    val popupElevation: Float,
     @ColorInt val popupColor: Int,
     @IntRange(from = 0, to = 255) val popupAlphaValue: Int,
     /** Margin between dialog and parent view when dialog opens upward */
@@ -65,7 +65,10 @@ data class ReactionsConfig(
     val textVerticalPadding: Int,
     val textSize: Float,
     val typeface: Typeface?,
-    val scaleFactor: Float
+    val scaleFactor: Float,
+    val targetX: Float?,
+    val targetY: Float?,
+    val dismissAnimationEnabled: Boolean,
 )
 
 private val NO_TEXT_PROVIDER: ReactionTextProvider = { _ -> null }
@@ -126,7 +129,9 @@ class ReactionsConfigBuilder(val context: Context) {
 
     var downwardPopupPoint: Int = 0
 
-    var popupCornerRadius: Int = 90
+    var popupCornerRadius: Float = 90f
+
+    var popupElevation: Float = 8f
 
     @ColorInt
     var popupColor: Int = Color.WHITE
@@ -153,7 +158,10 @@ class ReactionsConfigBuilder(val context: Context) {
     var textSize: Float = 0f
 
     var scaleFactor = 2.0f
-    var ignoreAppear = true
+    var targetX: Float? = null
+    var targetY: Float? = null
+    var dismissAnimationEnabled: Boolean = true
+
     // Builder pattern for Java
 
     fun withReactions(reactions: Collection<Reaction>) = this.also {
@@ -200,7 +208,7 @@ class ReactionsConfigBuilder(val context: Context) {
         this.popupMargin = popupMargin
     }
 
-    fun withPopupCornerRadius(popupCornerRadius: Int) = this.also {
+    fun withPopupCornerRadius(popupCornerRadius: Float) = this.also {
         this.popupCornerRadius = popupCornerRadius
     }
 
@@ -254,6 +262,7 @@ class ReactionsConfigBuilder(val context: Context) {
         popupGravity = popupGravity,
         popupMargin = popupMargin,
         popupCornerRadius = popupCornerRadius,
+        popupElevation = popupElevation,
         popupColor = popupColor,
         upwardPopupMargin = upwardPopupMargin,
         downwardPopupMargin = downwardPopupMargin,
@@ -275,6 +284,8 @@ class ReactionsConfigBuilder(val context: Context) {
             ?: context.resources.getDimension(R.dimen.reactions_text_size),
         typeface = customTypeface,
         scaleFactor = scaleFactor,
-        ignoreAppear = ignoreAppear,
+        targetX = targetX,
+        targetY = targetY,
+        dismissAnimationEnabled = dismissAnimationEnabled,
     )
 }
