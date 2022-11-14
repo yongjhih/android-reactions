@@ -66,8 +66,8 @@ data class ReactionsConfig(
     val textSize: Float,
     val typeface: Typeface?,
     val scaleFactor: Float,
-    val targetX: Float?,
-    val targetY: Float?,
+    val targetX: (() -> Float)?,
+    val targetY: (() -> Float)?,
     val dismissAnimationEnabled: Boolean,
 )
 
@@ -158,8 +158,8 @@ class ReactionsConfigBuilder(val context: Context) {
     var textSize: Float = 0f
 
     var scaleFactor = 2.0f
-    var targetX: Float? = null
-    var targetY: Float? = null
+    var targetX: (() -> Float)? = null
+    var targetY: (() -> Float)? = null
     var dismissAnimationEnabled: Boolean = true
 
     // Builder pattern for Java
