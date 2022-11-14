@@ -48,7 +48,7 @@ data class ReactionsConfig(
     val popupMargin: Int,
     val popupCornerRadius: Float,
     val popupElevation: Float,
-    @ColorInt val popupColor: Int,
+    @ColorInt val popupColor: Int?,
     @IntRange(from = 0, to = 255) val popupAlphaValue: Int,
     /** Margin between dialog and parent view when dialog opens upward */
     val upwardPopupMargin: Int,
@@ -134,7 +134,7 @@ class ReactionsConfigBuilder(val context: Context) {
     var popupElevation: Float = 8f
 
     @ColorInt
-    var popupColor: Int = Color.WHITE
+    var popupColor: Int? = null
 
     var popupAlpha: Int = 230
 
@@ -212,7 +212,7 @@ class ReactionsConfigBuilder(val context: Context) {
         this.popupCornerRadius = popupCornerRadius
     }
 
-    fun withPopupColor(@ColorInt popupColor: Int) = this.also {
+    fun withPopupColor(@ColorInt popupColor: Int?) = this.also {
         this.popupColor = popupColor
     }
 

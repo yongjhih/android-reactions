@@ -72,6 +72,7 @@ class ReactionViewGroup(
 
     private val background = CardView(context).also {
         it.layoutParams = LayoutParams(dialogWidth, dialogHeight)
+        config.popupColor?.let { color -> it.setCardBackgroundColor(color) }
         it.radius = config.popupCornerRadius
         it.cardElevation = config.popupElevation
         addView(it)
