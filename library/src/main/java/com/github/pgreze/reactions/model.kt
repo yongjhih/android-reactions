@@ -40,6 +40,7 @@ data class ReactionsConfig(
     val reactions: Collection<Reaction>,
     @Px val reactionSize: Int,
     @Px val horizontalMargin: Int,
+    @Px val iconDivider: Int?,
     @Px val verticalMargin: Int,
 
     /** Horizontal gravity compare to parent view or screen */
@@ -161,6 +162,7 @@ class ReactionsConfigBuilder(val context: Context) {
     var targetX: (() -> Float)? = null
     var targetY: (() -> Float)? = null
     var dismissAnimationEnabled: Boolean = true
+    var iconDivider: Int? = null
 
     // Builder pattern for Java
 
@@ -287,5 +289,6 @@ class ReactionsConfigBuilder(val context: Context) {
         targetX = targetX,
         targetY = targetY,
         dismissAnimationEnabled = dismissAnimationEnabled,
+        iconDivider = iconDivider,
     )
 }

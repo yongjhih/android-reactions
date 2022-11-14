@@ -40,7 +40,7 @@ class ReactionViewGroup(
     private val horizontalPadding: Int = config.horizontalMargin
     private val verticalPadding: Int = config.verticalMargin
 
-    private var iconDivider: Int = horizontalPadding / 2
+    private var iconDivider: Int = config.iconDivider ?: horizontalPadding
 
     private var smallIconSize: Int
     private var mediumIconSize: Int = config.reactionSize

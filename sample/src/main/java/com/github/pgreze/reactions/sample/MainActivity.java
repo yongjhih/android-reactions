@@ -7,6 +7,7 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.github.pgreze.reactions.PopupGravity;
 import com.github.pgreze.reactions.ReactionPopup;
 import com.github.pgreze.reactions.ReactionsConfigBuilder;
 
@@ -39,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
                                 R.drawable.ic_fb_angry,
                         })
                         .withReactionTexts(position -> strings[position])
+                        .withPopupGravity(PopupGravity.CENTER)
+                        .withHorizontalMargin(50)
                         .build());
 
         findViewById(R.id.facebook_btn).setOnTouchListener(popup);
