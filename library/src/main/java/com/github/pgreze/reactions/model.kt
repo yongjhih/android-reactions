@@ -70,6 +70,7 @@ data class ReactionsConfig(
     val targetX: (() -> Float)?,
     val targetY: (() -> Float)?,
     val dismissAnimationEnabled: Boolean,
+    val textMarginBottom: Int?,
 )
 
 private val NO_TEXT_PROVIDER: ReactionTextProvider = { _ -> null }
@@ -162,6 +163,7 @@ class ReactionsConfigBuilder(val context: Context) {
     var targetX: (() -> Float)? = null
     var targetY: (() -> Float)? = null
     var dismissAnimationEnabled: Boolean = true
+    val textMarginBottom: Int? = null
     var iconDivider: Int? = null
 
     // Builder pattern for Java
@@ -290,5 +292,6 @@ class ReactionsConfigBuilder(val context: Context) {
         targetY = targetY,
         dismissAnimationEnabled = dismissAnimationEnabled,
         iconDivider = iconDivider,
+        textMarginBottom = textMarginBottom,
     )
 }

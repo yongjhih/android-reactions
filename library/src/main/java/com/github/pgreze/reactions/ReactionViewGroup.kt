@@ -235,16 +235,17 @@ class ReactionViewGroup(
         if (reactionText.visibility == View.VISIBLE) {
             reactionText.measure(0, 0)
             val selectedView = (currentState as? ReactionViewState.Selected)?.view ?: return
+            val marginBottom = config.textMarginBottom ?: 3.dp
             val top = selectedView.top - min(
-                selectedView.layoutParams.size,
+                selectedView.measuredHeight,
                 reactionText.measuredHeight
-            )
+            ) - marginBottom.toFloat()
             val bottom = top + reactionText.measuredHeight
             val left = (selectedView.right - selectedView.left).let { width ->
                 selectedView.left + width / 2f - reactionText.measuredWidth / 2f
             }
             val right = left + reactionText.measuredWidth
-            reactionText.layout(left.toInt(), top, right.toInt(), bottom)
+            reactionText.layout(left.toInt(), top.roundToInt(), right.toInt(), bottom.roundToInt())
         }
     }
 
@@ -564,4 +565,9 @@ class ResizeAnimation(
 val Float.dp get() = TypedValue.applyDimension(
     TypedValue.COMPLEX_UNIT_DIP,
     this,
+    Resources.getSystem().displayMetrics)
+
+val Int.dp get() = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_DIP,
+    this.toFloat(),
     Resources.getSystem().displayMetrics)
