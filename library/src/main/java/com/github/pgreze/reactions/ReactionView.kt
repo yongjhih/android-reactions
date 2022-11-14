@@ -31,7 +31,7 @@ class ReactionView constructor(
             return field
         }
 
-    val child = reaction.onView(context)
+    private val child = reaction.onView(context)
 
     init {
         addView(child)
@@ -45,6 +45,11 @@ class ReactionView constructor(
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         //measureChildren(widthMeasureSpec, heightMeasureSpec)
         setMeasuredDimension(child.measuredWidth, child.measuredHeight)
+    }
+
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
+        location.set(0, 0)
     }
 
 }

@@ -262,15 +262,15 @@ class ReactionViewGroup(
                 // Track first moves of the first click, avoiding to auto-select first reaction
                 if (isIgnoringFirstReaction) {
                     val v = reactions.first()
-                    val isBelowFirstReaction = event.rawX >= v.x && event.rawX <= v.right &&
-                            event.rawY >= v.y + v.height && event.rawY <= v.y + v.height + dialogHeight
+                    val isBelowFirstReaction = event.rawX in v.x..v.right.toFloat() &&
+                            event.rawY in (v.y + v.height)..(v.y + v.height + dialogHeight)
                     isIgnoringFirstReaction = isIgnoringFirstReaction &&
                             (isBelowFirstReaction || isFirstTouchAlwaysInsideButton)
                     if (isIgnoringFirstReaction) return true
                 }
 
                 // Ignores when appearing
-                if (currentState is ReactionViewState.Boundary.Appear) return true
+                if (currentState is ReactionViewState.Boundary.Appear && config.ignoreAppear) return true
 
                 val view = getIntersectedIcon(event.rawX, event.rawY)
                 if (view == null) {
@@ -324,10 +324,8 @@ class ReactionViewGroup(
 
     private fun getIntersectedIcon(x: Float, y: Float): ReactionView? =
         reactions.firstOrNull {
-            x >= it.location.x - horizontalPadding
-                    && x < it.location.x + it.width + iconDivider
-                    && y >= it.location.y - horizontalPadding
-                    && y < it.location.y + it.height + dialogHeight + iconDivider
+            x.roundToInt() in (it.location.x - horizontalPadding)..(it.location.x + it.measuredWidth + iconDivider)
+                    && y.roundToInt() in (it.location.y - horizontalPadding)..(it.location.y + it.measuredHeight + dialogHeight + iconDivider)
         }
 
     private fun animTranslationY(boundary: ReactionViewState.Boundary) {

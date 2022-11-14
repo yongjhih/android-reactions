@@ -38,6 +38,7 @@ data class Reaction(
 
 data class ReactionsConfig(
     val reactions: Collection<Reaction>,
+    var ignoreAppear: Boolean,
     @Px val reactionSize: Int,
     @Px val horizontalMargin: Int,
     @Px val verticalMargin: Int,
@@ -152,6 +153,7 @@ class ReactionsConfigBuilder(val context: Context) {
     var textSize: Float = 0f
 
     var scaleFactor = 2.0f
+    var ignoreAppear = true
     // Builder pattern for Java
 
     fun withReactions(reactions: Collection<Reaction>) = this.also {
@@ -272,6 +274,7 @@ class ReactionsConfigBuilder(val context: Context) {
         textSize = textSize.takeIf { it != 0f }
             ?: context.resources.getDimension(R.dimen.reactions_text_size),
         typeface = customTypeface,
-        scaleFactor = scaleFactor
+        scaleFactor = scaleFactor,
+        ignoreAppear = ignoreAppear,
     )
 }
