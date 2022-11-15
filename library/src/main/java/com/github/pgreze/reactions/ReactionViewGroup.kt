@@ -86,7 +86,7 @@ class ReactionViewGroup(
             }
         }
         .toList()
-    private val reactionText: TextView = TextView(context)
+    private val reactionText: TextView = config.onTooltip?.invoke(context) ?: TextView(context)
         .also {
             if (config.typeface != null) {
                 it.typeface = config.typeface

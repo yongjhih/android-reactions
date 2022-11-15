@@ -6,6 +6,7 @@ import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.annotation.*
 import androidx.annotation.IntRange
 import androidx.core.content.ContextCompat
@@ -71,6 +72,7 @@ data class ReactionsConfig(
     val targetY: (() -> Float)?,
     val dismissAnimationEnabled: Boolean,
     val textMarginBottom: Int?,
+    val onTooltip: ((Context) -> TextView)?,
 )
 
 private val NO_TEXT_PROVIDER: ReactionTextProvider = { _ -> null }
@@ -164,6 +166,7 @@ class ReactionsConfigBuilder(val context: Context) {
     var targetY: (() -> Float)? = null
     var dismissAnimationEnabled: Boolean = true
     val textMarginBottom: Int? = null
+    val onTooltip: ((Context) -> TextView)? = null
     var iconDivider: Int? = null
 
     // Builder pattern for Java
@@ -293,5 +296,6 @@ class ReactionsConfigBuilder(val context: Context) {
         dismissAnimationEnabled = dismissAnimationEnabled,
         iconDivider = iconDivider,
         textMarginBottom = textMarginBottom,
+        onTooltip = onTooltip,
     )
 }
