@@ -43,6 +43,9 @@ data class ReactionsConfig(
     @Px val horizontalMargin: Int,
     @Px val iconDivider: Int?,
     @Px val verticalMargin: Int,
+    val scaleDuration: Long,
+    val shootDuration: Long,
+    val dismissDuration: Long,
 
     /** Horizontal gravity compare to parent view or screen */
     val popupGravity: PopupGravity,
@@ -120,6 +123,12 @@ class ReactionsConfigBuilder(val context: Context) {
 
     @Px
     var verticalMargin: Int = horizontalMargin
+
+    var scaleDuration: Long = 150L
+
+    var dismissDuration: Long = 100L
+
+    var shootDuration: Long = 500L
 
     var popupGravity: PopupGravity = PopupGravity.DEFAULT
 
@@ -297,5 +306,8 @@ class ReactionsConfigBuilder(val context: Context) {
         iconDivider = iconDivider,
         textMarginBottom = textMarginBottom,
         onTooltip = onTooltip,
+        scaleDuration = scaleDuration,
+        shootDuration = shootDuration,
+        dismissDuration = dismissDuration,
     )
 }

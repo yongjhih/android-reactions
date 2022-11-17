@@ -33,8 +33,6 @@ class ReactionViewGroup(
 
     private companion object {
         private const val TAG = "Reaction"
-        const val SCALE_DURATION = 100L
-        const val DISMISS_DURATION = 500L
     }
 
     private val horizontalPadding: Int = config.horizontalMargin
@@ -122,7 +120,7 @@ class ReactionViewGroup(
                     //background.layoutParams = LayoutParams(dialogWidth, mediumIconSize)
                     //background.requestLayout()
                     background.startAnimation(ResizeAnimation(background, dialogWidth, mediumIconSize).apply {
-                        duration = SCALE_DURATION
+                        duration = config.scaleDuration
                     })
                     animSize(null)
                 }
@@ -130,7 +128,7 @@ class ReactionViewGroup(
                     //background.layoutParams = LayoutParams(dialogWidth, smallIconSize)
                     //background.requestLayout()
                     background.startAnimation(ResizeAnimation(background, dialogWidth, smallIconSize).apply {
-                        duration = SCALE_DURATION
+                        duration = config.scaleDuration
                     })
                     animSize(value)
                 }
@@ -143,7 +141,6 @@ class ReactionViewGroup(
 
             field = value
             reactionText.visibility = View.GONE
-            field?.duration = SCALE_DURATION
             field?.start()
         }
 
@@ -379,11 +376,11 @@ class ReactionViewGroup(
                     isAnimating = false
                     onDismissed()
                 }
-                .apply { duration = DISMISS_DURATION + 1 }
+                .apply { duration = config.shootDuration + 1 }
                 .scaleX(0.1f).scaleY(0.1f)
                 .start()
             val animator = ValueAnimator.ofFloat(0f, 1f)
-            animator.duration = DISMISS_DURATION
+            animator.duration = config.shootDuration
             animator.interpolator = AccelerateDecelerateInterpolator()
             val targetX = v.left - (config.targetX?.invoke() ?: showPoint?.x?.minus(horizontalPadding) ?: v.x).toFloat()
             val targetY = v.bottom - (config.targetY?.invoke() ?: showPoint?.y?.minus(verticalPadding) ?: v.y).toFloat()
@@ -403,6 +400,7 @@ class ReactionViewGroup(
         // TODO: animate selected index if boundary == Disappear
         currentAnimator = ValueAnimator.ofFloat(0f, 1f)
             .apply {
+                duration = config.dismissDuration
                 addUpdateListener { animator ->
                     val progress = animator.animatedValue as Float
                     val translationY = boundary.path.progressMove(progress).toFloat()
@@ -455,6 +453,8 @@ class ReactionViewGroup(
 
         currentAnimator = ValueAnimator.ofFloat(0f, 1f)
             .apply {
+                duration = config.scaleDuration
+                interpolator = AccelerateDecelerateInterpolator()
                 addUpdateListener {
                     val progress = it.animatedValue as Float
 
