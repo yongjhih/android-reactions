@@ -27,6 +27,7 @@ class ReactionPopup @JvmOverloads constructor(
             ViewGroup.LayoutParams.MATCH_PARENT
         )
     }
+
     private val view: ReactionViewGroup by lazy(LazyThreadSafetyMode.NONE) {
         // Lazily inflate content during first display
         ReactionViewGroup(context, reactionsConfig).also {

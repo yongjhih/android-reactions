@@ -71,8 +71,8 @@ data class ReactionsConfig(
     val textSize: Float,
     val typeface: Typeface?,
     val scaleFactor: Float,
-    val targetX: (() -> Float)?,
-    val targetY: (() -> Float)?,
+    val targetX: ((View) -> Float)?,
+    val targetY: ((View) -> Float)?,
     val dismissAnimationEnabled: Boolean,
     val textMarginBottom: Int?,
     val onTooltip: ((Context) -> TextView)?,
@@ -171,8 +171,8 @@ class ReactionsConfigBuilder(val context: Context) {
     var textSize: Float = 0f
 
     var scaleFactor = 2.0f
-    var targetX: (() -> Float)? = null
-    var targetY: (() -> Float)? = null
+    var targetX: ((View) -> Float)? = null
+    var targetY: ((View) -> Float)? = null
     var dismissAnimationEnabled: Boolean = true
     val textMarginBottom: Int? = null
     val onTooltip: ((Context) -> TextView)? = null

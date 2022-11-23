@@ -382,8 +382,8 @@ class ReactionViewGroup(
             val animator = ValueAnimator.ofFloat(0f, 1f)
             animator.duration = config.shootDuration
             animator.interpolator = AccelerateDecelerateInterpolator()
-            val targetX = v.left - (config.targetX?.invoke() ?: showPoint?.x?.minus(horizontalPadding) ?: v.x).toFloat()
-            val targetY = v.bottom - (config.targetY?.invoke() ?: showPoint?.y?.minus(verticalPadding) ?: v.y).toFloat()
+            val targetX = config.targetX?.invoke(v) ?: (v.left - (showPoint?.x?.minus(horizontalPadding) ?: v.x).toFloat())
+            val targetY = config.targetY?.invoke(v) ?: (v.bottom - (showPoint?.y?.minus(verticalPadding) ?: v.y).toFloat())
             animator.addUpdateListener { animation ->
                 val value = animation.animatedValue as Float
                 v.translationX = -targetX * value
